@@ -67,6 +67,7 @@ const tools: ChatCompletionTool[] = [
                 properties: {
                     persona_analysis: { type: 'string', description: "Analysis of user's investment style and risk profile" },
                     recommendation: { type: 'string', description: 'Tailored stock recommendation based on sentiment and market analysis' },
+                    reasoning: { type: 'string', description: 'Explain why you have chosen recommandation for given persona and usecase' },
                     potential_risks: { type: 'array', items: { type: 'string' }, description: 'Possible risks the user should consider' },
                 },
                 required: ['persona_analysis', 'recommendation', 'potential_risks'],
@@ -81,7 +82,7 @@ export async function processPrompt(apiKey: string, ticker: string, persona: str
     });
 
     const response = await client.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
             {
                 role: 'system',
@@ -118,6 +119,8 @@ export async function processPrompt(apiKey: string, ticker: string, persona: str
         ],
         tools,
     });
+
+    console.log('token usage', response.usage);
 
     const output: Record<string, unknown> = {};
 
