@@ -11,13 +11,15 @@ import { getGoogleNewsPosts } from './google.js';
 // note that we need to use `.js` even when inside TS files
 // import { router } from './routes.js';
 
-// The init() call configures the Actor for its environment. It's recommended to start every Actor with an init().
-await Actor.init();
-
 interface Input {
     ticker: string;
     persona: string;
 }
+
+// The init() call configures the Actor for its environment. It's recommended to start every Actor with an init().
+await Actor.init();
+await Actor.charge({ eventName: 'init' });
+
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
 
@@ -36,6 +38,7 @@ const response = await processPrompt(ticker, input.persona, { google, twitter })
 if (response != null) {
     // Save headings to Dataset - a table-like storage.
     await Actor.pushData(response);
+    await Actor.charge({ eventName: 'analysis' });
 }
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().

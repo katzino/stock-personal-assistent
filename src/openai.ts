@@ -64,8 +64,6 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
         tools,
     });
 
-    console.log('token usage', response.usage);
-
     const output: Record<string, unknown> = {};
 
     for (const tool of response.choices[0].message.tool_calls ?? []) {
