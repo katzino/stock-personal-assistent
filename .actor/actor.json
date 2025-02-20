@@ -8,5 +8,8 @@
 		"templateId": "ts-start"
 	},
 	"input": "./input_schema.json",
+	"storages": {
+		"dataset": "./dataset_schema.json"
+	},
 	"dockerfile": "./Dockerfile"
 }
