@@ -11,12 +11,7 @@
                         "type": "object",
                         "properties": {
                             "category": {
-                                "type": "string",
-                                "enum": [
-                                    "Positive",
-                                    "Neutral",
-                                    "Negative"
-                                ]
+                                "type": "string"
                             },
                             "confidence": {
                                 "type": "number"
@@ -33,12 +28,7 @@
                         "type": "object",
                         "properties": {
                             "category": {
-                                "type": "string",
-                                "enum": [
-                                    "Positive",
-                                    "Neutral",
-                                    "Negative"
-                                ]
+                                "type": "string"
                             },
                             "confidence": {
                                 "type": "number"
