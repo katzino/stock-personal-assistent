@@ -2,26 +2,37 @@ import OpenAI from 'openai';
 import { ChatCompletionTool } from 'openai/resources';
 
 import type { TwitterPost } from './twitter.js';
+import type { GoogleNewsPost } from './google.js';
 
 type ScrapedData = {
+    google: GoogleNewsPost[];
     twitter: TwitterPost[];
 }
+
+const analysis = {
+    type: 'object',
+    properties: {
+        category: { type: 'string', enum: ['Positive', 'Neutral', 'Negative'], description: 'Sentiment category' },
+        confidence: { type: 'number', description: 'Confidence score (0-100%)' },
+        sentiment_score: { type: 'number', description: 'Sentiment score from 0 (negative) to 10 (positive)' },
+        reasoning: { type: 'string', description: 'Explanation of sentiment' },
+    },
+    required: ['category', 'confidence', 'sentiment_score', 'reasoning'],
+};
 
 const tools: ChatCompletionTool[] = [
     {
         type: 'function',
         function: {
             name: 'sentiment_analysis',
-            description: 'Analyze sentiment for the given ticker based on market data.',
+            description: 'Analyze sentiment for the given ticker based on market data for each dataset separately.',
             parameters: {
                 type: 'object',
                 properties: {
-                    category: { type: 'string', enum: ['Positive', 'Neutral', 'Negative'], description: 'Sentiment category' },
-                    confidence: { type: 'number', description: 'Confidence score (0-100%)' },
-                    sentiment_score: { type: 'number', description: 'Sentiment score from 0 (negative) to 10 (positive)' },
-                    reasoning: { type: 'string', description: 'Explanation of sentiment' },
+                    google: analysis,
+                    twitter: analysis,
                 },
-                required: ['category', 'confidence', 'sentiment_score', 'reasoning'],
+                required: ['google', 'twitter'],
             },
         },
     },
@@ -29,7 +40,7 @@ const tools: ChatCompletionTool[] = [
         type: 'function',
         function: {
             name: 'market_summary',
-            description: 'Provide a market summary of the given ticker.',
+            description: 'Provide a market summary of the given ticker. Prioritize those resources based on user\'s persona and usecase.',
             parameters: {
                 type: 'object',
                 properties: {
@@ -46,7 +57,11 @@ const tools: ChatCompletionTool[] = [
         type: 'function',
         function: {
             name: 'personalized_recommendation',
-            description: 'Provide a personalized investment recommendation based on the user persona.',
+            description: `
+                Provide a personalized investment recommendation based on the user persona and usecase.
+                Do not focus on generic information, be as actionable and specific as possible.
+                Also adjust your language and reasoning so it corresponds with user's persona.
+            `,
             parameters: {
                 type: 'object',
                 properties: {
@@ -77,6 +92,14 @@ export async function processPrompt(apiKey: string, ticker: string, persona: str
                         1) Sentiment Analysis
                         2) Market Summary
                         3) Personalized Recommendation based on the user persona.
+
+                        For each dataset consider different evaluation and importance:
+                        - google
+                            - post index, source, date
+                            - more serious and reputable sources
+                        - twitter
+                            - tweet index, author, impressions, date
+                            - lot of noise, less serious but can generate momentum
 
                         Always respond using function calls to return structured JSON output.
                     `,

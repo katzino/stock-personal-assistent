@@ -1,4 +1,5 @@
 import { Actor } from 'apify';
+import { startDate } from './common.js';
 
 export type TwitterPost = {
     author: {
@@ -21,7 +22,7 @@ export type TwitterPost = {
     viewCount: number;
 };
 
-export async function getTwitterPosts(ticker: string, start: string) {
+export async function getTwitterPosts(ticker: string) {
     const run = await Actor.call('61RPP7dywgiy0JPD0', {
         includeSearchTerms: true,
         maxItems: 10,
@@ -32,7 +33,7 @@ export async function getTwitterPosts(ticker: string, start: string) {
         onlyVideo: false,
         searchTerms: [ticker],
         sort: 'Top',
-        start,
+        start: startDate,
         tweetLanguage: 'en',
     });
 
