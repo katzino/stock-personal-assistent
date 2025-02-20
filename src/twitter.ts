@@ -1,6 +1,6 @@
 import { Actor } from 'apify';
 
-type TwitterPost = {
+export type TwitterPost = {
     author: {
         userName: string;
         name: string;

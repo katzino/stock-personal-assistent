@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 
 import { getTwitterPosts } from './twitter.js';
 import { normalizeTicker } from './common.js';
+import { processPrompt } from './openai.js';
 
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
@@ -25,10 +26,12 @@ if (!input) throw new Error('Input is missing!');
 const ticker = normalizeTicker(input.ticker);
 const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
-await Promise.all([getTwitterPosts(ticker, startDate)]);
+const [twitter] = await Promise.all([getTwitterPosts(ticker, startDate)]);
+
+const response = await processPrompt(input.openai_api_key, ticker, input.persona, { twitter });
 
 // Save headings to Dataset - a table-like storage.
-// await Actor.pushata(headings);
+await Actor.pushData(response);
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().
 await Actor.exit();
