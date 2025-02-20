@@ -2,7 +2,7 @@
 import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
-import { normalizeTicker } from './common.js';
+import { isTickerValid, normalizeTicker } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 
@@ -22,6 +22,7 @@ interface Input {
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
+else if (!(await isTickerValid(input.ticker))) throw new Error('Stock ticker is invalid!');
 
 const ticker = normalizeTicker(input.ticker);
 
