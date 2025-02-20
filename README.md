@@ -1,82 +1,65 @@
-## Scrape single-page in TypeScript template
+# Market Mind AI
+## Introduction and Features
+Market Mind AI is a powerful finance monitoring agent designed to help users analyze market sentiment and make informed investing decisions. Quickly try it by inputting the stock ticker you're interested in and your investment persona.
 
-A template for scraping data from a single web page in TypeScript (Node.js). The URL of the web page is passed in via input, which is defined by the [input schema](https://docs.apify.com/platform/actors/development/input-schema). The template uses the [Axios client](https://axios-http.com/docs/intro) to get the HTML of the page and the [Cheerio library](https://cheerio.js.org/) to parse the data from it. The data are then stored in a [dataset](https://docs.apify.com/sdk/js/docs/guides/result-storage#dataset) where you can easily access them.
+### Key Features
+- **Ticker Analysis**: Input the stock ticker (e.g., TSLA, AAPL) to receive tailored insights.
+- **Market Sentiment Analysis**: This Actor performs comprehensive sentiment analyses to gauge market trends and provide personalized investment recommendations.
+- **Social Media Insights**: Analyze content from platforms like Google News and X (formerly Twitter) to enrich your investment strategy.
 
-The scraped data in this template are page headings but you can easily edit the code to scrape whatever you want from the page.
+| Feature | Description |
+|----------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| Actor Start | Fixed fee for starting an Actor run at **$0.03** |
+| Google News Article Analysis | Aggregate articles from Google News for **$0.70** |
+| Tweet Analysis | Analyze tweets from X for a fee of **$0.70** |
+| Market Sentiment Analysis | Perform sentiment analysis generating summaries and recommendations at **$0.262** |
 
-## Included features
+Apify's platform enhances Market Mind AI with API access, scheduling, and proxy rotation.
 
-- **[Apify SDK](https://docs.apify.com/sdk/js/)** - a toolkit for building [Actors](https://apify.com/actors)
-- **[Input schema](https://docs.apify.com/platform/actors/development/input-schema)** - define and easily validate a schema for your Actor's input
-- **[Dataset](https://docs.apify.com/sdk/js/docs/guides/result-storage#dataset)** - store structured data where each object stored has the same attributes
-- **[Axios client](https://axios-http.com/docs/intro)** - promise-based HTTP Client for Node.js and the browser
-- **[Cheerio](https://cheerio.js.org/)** - library for parsing and manipulating HTML and XML
+## How to Use Market Mind AI\nFollow these steps to start using Market Mind AI for your investment analysis: 
+1. **Input Ticker**: Input the stock ticker you want to analyze (e.g., TSLA).
+2. **Define Persona**: Describe the type of investor you are (e.g., conservative, aggressive).
+3. **Run the Actor**: Start the actor to receive analyses and recommendations.
 
-## How it works
+## Pricing Explanation
+Market Mind AI operates under a Pay per Event pricing model, allowing flexibility based on usage. Costs include:
+- **Actor Start**: $0.03
+- **Analyzing Google Articles**: $0.70 per run
+- **Analyzing Tweets**: $0.70 per analysis\n- **Market Sentiment Analysis**: $0.262 per run
 
-1. `Actor.getInput()` gets the input where the page URL is defined
-2. `axios.get(url)` fetches the page
-3. `cheerio.load(response.data)` loads the page data and enables parsing the headings
-4. This parses the headings from the page and here you can edit the code to parse whatever you need from the page
-    
-    ```javascript
-    $("h1, h2, h3, h4, h5, h6").each((_i, element) => {...});
-    ```
-    
-5. `Actor.pushData(headings)` stores the headings in the dataset
+For typical use scenarios, you can expect reasonable costs based on the complexity of the analysis.
 
-## Resources
-
-- [Web scraping in Node.js with Axios and Cheerio](https://blog.apify.com/web-scraping-with-axios-and-cheerio/)
-- [Web scraping with Cheerio in 2023](https://blog.apify.com/web-scraping-with-cheerio/)
-- [Video tutorial](https://www.youtube.com/watch?v=yTRHomGg9uQ) on building a scraper using CheerioCrawler
-- [Written tutorial](https://docs.apify.com/academy/web-scraping-for-beginners/challenge) on building a scraper using CheerioCrawler
-- [Integration with Zapier](https://apify.com/integrations), Make, Google Drive, and others
-- [Video guide on getting scraped data using Apify API](https://www.youtube.com/watch?v=ViYYDHSBAKM)
-- A short guide on how to build web scrapers using code templates:
-
-[web scraper template](https://www.youtube.com/watch?v=u-i-Korzf8w)
-
-
-
-## Getting started
-
-For complete information [see this article](https://docs.apify.com/platform/actors/development#build-actor-locally). To run the actor use the following command:
-
-```bash
-apify run
+## Input and Output Examples
+### Input Requirements
+The input for this actor is a JSON object requiring:
+```json
+{
+    "ticker": "TSLA",
+    "persona": "I'm a conservative investor aiming for a long-term investment horizon"
+}
 ```
 
-## Deploy to Apify
+### Expected Output
+Upon running the Actor, the expected output will be a JSON object that includes:
 
-### Connect Git repository to Apify
+```json
+TODO:
+```
 
-If you've created a Git repository for the project, you can easily connect to Apify:
+## FAQ, Disclaimers, and Support
+### FAQs
+- **Is it legal to use Market Mind AI for scraping data?**
+Market Mind AI operates within ethical guidelines and does not extract private user data.
 
-1. Go to [Actor creation page](https://console.apify.com/actors/new)
-2. Click on **Link Git Repository** button
-
-### Push project on your local machine to Apify
-
-You can also deploy the project on your local machine to Apify without the need for the Git repository.
-
-1. Log in to Apify. You will need to provide your [Apify API Token](https://console.apify.com/account/integrations) to complete this action.
-
-    ```bash
-    apify login
-    ```
-
-2. Deploy your Actor. This command will deploy and build the Actor on the Apify Platform. You can find your newly created Actor under [Actors -> My Actors](https://console.apify.com/actors?tab=my).
-
-    ```bash
-    apify push
-    ```
-
-## Documentation reference
-
-To learn more about Apify and Actors, take a look at the following resources:
-
-- [Apify SDK for JavaScript documentation](https://docs.apify.com/sdk/js)
-- [Apify SDK for Python documentation](https://docs.apify.com/sdk/python)
-- [Apify Platform documentation](https://docs.apify.com/platform)
-- [Join our developer community on Discord](https://discord.com/invite/jyEM2PRvMU)
+- **What if I encounter issues?**
+ Direct any technical feedback to our [support page](https://apify.com/support).
+ 
+ ### Disclaimer
+ Always ensure that your use of data complies with applicable laws and regulations. 
+ 
+ For additional queries or technical issues, please visit our support channels available on the Apify platform.
+ 
+ ### Your Feedback
+ We are constantly working on improving Market Mind AI. Please provide feedback or report any issues through our support page. 
+ 
+ Thank you for choosing Market Mind AI for your financial analysis needs!
