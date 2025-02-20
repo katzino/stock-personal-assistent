@@ -2,6 +2,7 @@
 import { Actor } from 'apify';
 import dayjs from 'dayjs';
 
+import { getTwitterPosts } from './twitter.js';
 import { normalizeTicker } from './common.js';
 
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
@@ -24,8 +25,10 @@ if (!input) throw new Error('Input is missing!');
 const ticker = normalizeTicker(input.ticker);
 const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
+await Promise.all([getTwitterPosts(ticker, startDate)]);
+
 // Save headings to Dataset - a table-like storage.
-// await Actor.pushData(headings);
+// await Actor.pushata(headings);
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().
 await Actor.exit();
