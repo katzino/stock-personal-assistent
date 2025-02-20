@@ -37,9 +37,13 @@ export async function getTwitterPosts(ticker: string) {
         tweetLanguage: 'en',
     });
 
-    const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
+    if (run.status === 'SUCCEEDED') {
+        const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
 
-    return normalizeTwitterPosts(items as TwitterPost[]);
+        return normalizeTwitterPosts(items as TwitterPost[]);
+    }
+
+    return null;
 }
 
 function normalizeTwitterPosts<T extends TwitterPost>(items: T[]): TwitterPost[] {

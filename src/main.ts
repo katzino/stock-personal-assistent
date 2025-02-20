@@ -17,10 +17,10 @@ await Actor.init();
 interface Input {
     ticker: string;
     persona: string;
-    openai_api_key: string;
 }
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
+
 if (!input) throw new Error('Input is missing!');
 else if (!(await isTickerValid(input.ticker))) throw new Error('Stock ticker is invalid!');
 
@@ -31,10 +31,12 @@ const [google, twitter] = await Promise.all([
     getTwitterPosts(ticker),
 ]);
 
-const response = await processPrompt(input.openai_api_key, ticker, input.persona, { google, twitter });
+const response = await processPrompt(ticker, input.persona, { google, twitter });
 
-// Save headings to Dataset - a table-like storage.
-await Actor.pushData(response);
+if (response != null) {
+    // Save headings to Dataset - a table-like storage.
+    await Actor.pushData(response);
+}
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().
 await Actor.exit();

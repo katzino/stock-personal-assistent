@@ -18,9 +18,13 @@ export async function getGoogleNewsPosts(ticker: string) {
         time_period: 'last_month',
     });
 
-    const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
+    if (run.status === 'SUCCEEDED') {
+        const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
 
-    return normalizeGoogleNewsPost(items as GoogleNewsPost[]);
+        return normalizeGoogleNewsPost(items as GoogleNewsPost[]);
+    }
+
+    return null;
 }
 
 function normalizeGoogleNewsPost<T extends GoogleNewsPost>(items: T[]): GoogleNewsPost[] {
