@@ -1,0 +1,36 @@
+{
+    "title": "Finance Monitoring Agent",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+      "ticker": {
+        "title": "Ticker",
+        "type": "string",
+        "description": "The ticker of the stock to analyze (e.g. TSLA, AAPL, AMZN).",
+        "editor": "textfield",
+        "prefill": "TSLA"
+      },
+      "persona": {
+        "title": "Persona",
+        "type": "string",
+        "description": "Describe whom the recommendation is targeted for",
+        "editor": "textfield",
+        "prefill": "I'm a conservative investor with aiming for long-term investment horizon"
+      },
+      "openai_api_key": {
+        "title": "OpenAI API Key",
+        "type": "string",
+        "description": "The API key for the OpenAI API.",
+        "editor": "textfield",
+        "isSecret": true
+      },
+      "debug": {
+        "title": "Debug",
+        "type": "boolean",
+        "description": "If enabled, the Actor will run in debug mode and produce more output.",
+        "editor": "checkbox",
+        "default": false
+      }
+    },
+    "required": ["ticker", "persona", "openai_api_key"]
+  }
