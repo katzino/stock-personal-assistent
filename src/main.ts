@@ -1,5 +1,8 @@
 // Apify SDK - toolkit for building Apify Actors (Read more at https://docs.apify.com/sdk/js/).
 import { Actor } from 'apify';
+import dayjs from 'dayjs';
+
+import { normalizeTicker } from './common.js';
 
 // this is ESM project, and as such, it requires you to specify extensions in your relative imports
 // read more about this here: https://nodejs.org/docs/latest-v18.x/api/esm.html#mandatory-file-extensions
@@ -17,6 +20,9 @@ interface Input {
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
 if (!input) throw new Error('Input is missing!');
+
+const ticker = normalizeTicker(input.ticker);
+const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
 // Save headings to Dataset - a table-like storage.
 // await Actor.pushData(headings);
