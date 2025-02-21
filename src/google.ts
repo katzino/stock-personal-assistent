@@ -1,4 +1,5 @@
 import { Actor } from 'apify';
+import { reportResearchData, RESEARCH_DEPTH } from './common.js';
 
 export type GoogleNewsPost = {
     title: string;
@@ -13,7 +14,7 @@ export async function getGoogleNewsPosts(ticker: string) {
         gl: 'us',
         hl: 'en',
         lr: 'lang_en',
-        maxItems: 100,
+        maxItems: RESEARCH_DEPTH,
         query: ticker,
         time_period: 'last_month',
     });
@@ -21,6 +22,7 @@ export async function getGoogleNewsPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'google' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
+        await reportResearchData('google', run.defaultDatasetId);
 
         return normalizeGoogleNewsPost(items as GoogleNewsPost[]);
     }

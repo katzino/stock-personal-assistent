@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { startDate } from './common.js';
+import { reportResearchData, RESEARCH_DEPTH, startDate } from './common.js';
 
 export type TwitterPost = {
     author: {
@@ -25,7 +25,7 @@ export type TwitterPost = {
 export async function getTwitterPosts(ticker: string) {
     const run = await Actor.call('61RPP7dywgiy0JPD0', {
         includeSearchTerms: true,
-        maxItems: 10,
+        maxItems: RESEARCH_DEPTH,
         onlyImage: false,
         onlyQuote: false,
         onlyTwitterBlue: false,
@@ -40,6 +40,7 @@ export async function getTwitterPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'twitter' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
+        await reportResearchData('twitter', run.defaultDatasetId);
 
         return normalizeTwitterPosts(items as TwitterPost[]);
     }
