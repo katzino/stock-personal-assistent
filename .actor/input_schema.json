@@ -6,7 +6,7 @@
       "ticker": {
         "title": "Ticker",
         "type": "string",
-        "description": "The ticker of the stock to analyze (e.g. TSLA, AAPL, AMZN).",
+        "description": "The ticker of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks",
         "editor": "textfield",
         "prefill": "TSLA"
       },
