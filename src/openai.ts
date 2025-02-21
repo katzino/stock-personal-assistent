@@ -137,7 +137,12 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                     type: 'object',
                     properties: {
                         persona_analysis: { type: 'string', description: "Analysis of user's investment style and risk profile" },
-                        recommendation: { type: 'string', description: 'Tailored stock recommendation based on sentiment and market analysis' },
+                        action: {
+                            type: 'string',
+                            enum: ['Buy', 'Hold', 'Sell'],
+                            description: 'Actionable recommandation based on sentiment and market analysis and user\'persona and usecase',
+                        },
+                        summary: { type: 'string', description: 'Tailored stock recommendation summary based on sentiment and market analysis' },
                         reasoning: { type: 'string', description: 'Explain why you have chosen recommandation for given persona and usecase' },
                         potential_risks: { type: 'array', items: { type: 'string' }, description: 'Possible risks the user should consider' },
                     },
