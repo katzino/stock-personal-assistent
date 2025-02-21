@@ -118,8 +118,8 @@ Market Mind AI operates under the [Pay Per Event (PPE)](https://docs.apify.com/s
 | Event                        | Description                                                                       |
 | ---------------------------- | --------------------------------------------------------------------------------- |
 | Actor Start                  | Fixed fee for starting an Actor run at **$0.03**                                  |
-| Google News Article Analysis | Aggregate articles from Google News for **$0.70**                                 |
-| Tweet Analysis               | Analyze tweets from X for a fee of **$0.70**                                      |
+| Google News Article Analysis | Aggregate articles from Google News for **$0.354**                                 |
+| Tweet Analysis               | Analyze tweets from X for a fee of **$0.354**                                      |
 | Market Sentiment Analysis    | Perform sentiment analysis generating summaries and recommendations at **$0.262** |
 
 [Apify's platform](https://docs.apify.com/platform) enhances Market Mind AI with API access, scheduling capabilities, and data storage options for your convenience and flexibility.
