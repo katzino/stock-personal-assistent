@@ -1,6 +1,6 @@
 # Market Mind AI
 
-## Get real-time market sentiment and personalized summary analyses
+## Get real-time market sentiment, summary and personalized investment recommendations for your stock ticker
 
 Market Mind AI is a powerful finance monitoring agent designed to help you analyze market sentiment and make personalized informed investing decisions.
 
