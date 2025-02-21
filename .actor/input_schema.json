@@ -14,7 +14,7 @@
         "title": "Persona",
         "type": "string",
         "description": "Describe whom the recommendation is targeted for",
-        "editor": "textfield",
+        "editor": "textarea",
         "prefill": "I'm a conservative investor with aiming for long-term investment horizon"
       }
     },
