@@ -3,20 +3,20 @@ import { reportResearchData, RESEARCH_DEPTH } from './common.js';
 
 export type GoogleNewsPost = {
     title: string;
-    snippet: string;
+    description: string;
     source: string;
     date: string;
 };
 
 export async function getGoogleNewsPosts(ticker: string) {
-    const run = await Actor.call('6vAxbA15R5J4uLKZ0', {
-        cr: 'us',
-        gl: 'us',
-        hl: 'en',
-        lr: 'lang_en',
-        maxItems: RESEARCH_DEPTH,
-        query: ticker,
-        time_period: 'last_month',
+    const run = await Actor.call('fUkiYdRK6KtcuOgXt', {
+        extract_description: true,
+        extract_image: false,
+        keyword: ticker,
+        max_articles: RESEARCH_DEPTH,
+        region_language: 'US:en',
+        date: '30d',
+        proxy_type: 'RESIDENTIAL',
     });
 
     if (run.status === 'SUCCEEDED') {
@@ -33,7 +33,7 @@ export async function getGoogleNewsPosts(ticker: string) {
 function normalizeGoogleNewsPost<T extends GoogleNewsPost>(items: T[]): GoogleNewsPost[] {
     return items.map((item) => ({
         title: item.title,
-        snippet: item.snippet,
+        description: item.description,
         source: item.source,
         date: item.date,
     }));

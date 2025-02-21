@@ -18,7 +18,7 @@ export function normalizeTicker(input: string) {
 }
 
 const RESEARCH_STORE_ID = 'RESEARCH';
-export const RESEARCH_DEPTH = 100;
+export const RESEARCH_DEPTH = 50;
 
 export async function reportResearchData(key: string, datasetId: string) {
     const value = await KeyValueStore.getValue(RESEARCH_STORE_ID) ?? {};
