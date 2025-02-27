@@ -1,4 +1,8 @@
+[![Market Mind AI](https://apify.com/actor-badge?actor=katzino/market-mind-ai)](https://apify.com/katzino/market-mind-ai)
+
 # Market Mind AI
+
+This is an open source Apify Actor agent. You can find the source code [here](https://github.com/katzino/stock-personal-assistent).
 
 ## Get real-time market sentiment, summary and personalized investment recommendations for your stock ticker
 
