@@ -1,6 +1,13 @@
 import { Actor } from 'apify';
 import { reportResearchData, RESEARCH_DEPTH } from './common.js';
 
+type GoogleNewsPostInput = {
+    Title: string;
+    Description: string;
+    'Source Name': string;
+    Date: string;
+};
+
 export type GoogleNewsPost = {
     title: string;
     description: string;
@@ -9,14 +16,10 @@ export type GoogleNewsPost = {
 };
 
 export async function getGoogleNewsPosts(ticker: string) {
-    const run = await Actor.call('fUkiYdRK6KtcuOgXt', {
-        extract_description: true,
-        extract_image: false,
+    const run = await Actor.call('KIe0dFDnUt4mqQyVI', {
         keyword: ticker,
-        max_articles: RESEARCH_DEPTH,
-        region_language: 'US:en',
-        date: '30d',
-        proxy_type: 'RESIDENTIAL',
+        maxitems: RESEARCH_DEPTH,
+        time_filter: 'Less than a month 🗓️',
     });
 
     if (run.status === 'SUCCEEDED') {
@@ -24,17 +27,17 @@ export async function getGoogleNewsPosts(ticker: string) {
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
         await reportResearchData('google', run.defaultDatasetId);
 
-        return normalizeGoogleNewsPost(items as GoogleNewsPost[]);
+        return normalizeGoogleNewsPost(items as GoogleNewsPostInput[]);
     }
 
     return null;
 }
 
-function normalizeGoogleNewsPost<T extends GoogleNewsPost>(items: T[]): GoogleNewsPost[] {
+function normalizeGoogleNewsPost(items: GoogleNewsPostInput[]): GoogleNewsPost[] {
     return items.map((item) => ({
-        title: item.title,
-        description: item.description,
-        source: item.source,
-        date: item.date,
+        title: item.Title,
+        description: item.Description,
+        source: item['Source Name'],
+        date: item.Date,
     }));
 }
