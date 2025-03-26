@@ -43,7 +43,7 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
                             - post index, source, date
                             - more serious and reputable sources
                         - twitter
-                            - tweet index, author, impressions, date
+                            - tweet index, author (if available), impressions, date
                             - lot of noise, less serious but can generate momentum
 
                         Always respond using function calls to return structured JSON output.

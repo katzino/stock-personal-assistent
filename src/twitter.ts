@@ -2,7 +2,7 @@ import { Actor } from 'apify';
 import { reportResearchData, RESEARCH_DEPTH, startDate } from './common.js';
 
 export type TwitterPost = {
-    author: {
+    author?: {
         userName: string;
         name: string;
         isVerified: boolean;
@@ -50,7 +50,7 @@ export async function getTwitterPosts(ticker: string) {
 
 function normalizeTwitterPosts<T extends TwitterPost>(items: T[]): TwitterPost[] {
     return items.map((item) => ({
-        author: {
+        author: item.author != null ? {
             userName: item.author.userName,
             name: item.author.name,
             isVerified: item.author.isVerified,
@@ -59,7 +59,7 @@ function normalizeTwitterPosts<T extends TwitterPost>(items: T[]): TwitterPost[]
             location: item.author.location,
             followers: item.author.followers,
             createdAt: item.author.createdAt,
-        },
+        } : undefined,
         bookmarkCount: item.bookmarkCount,
         createdAt: item.createdAt,
         fullText: item.fullText,
