@@ -1,6 +1,11 @@
 import { KeyValueStore } from 'apify';
 import dayjs from 'dayjs';
 
+export const ERRORS = {
+    INVALID_TICKER: 'Stock ticker is invalid!',
+    ANALYSIS_FAILED: 'Analysis failed!',
+};
+
 export const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
 export async function isTickerValid(input: string) {

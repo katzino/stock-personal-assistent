@@ -4,27 +4,25 @@
 
 This is an open source Apify Actor agent. You can find the source code [here](https://github.com/katzino/stock-personal-assistent).
 
-## Get real-time market sentiment, summary and personalized investment recommendations for your stock ticker
+## Get real-time market sentiment, summary and personalized investment recommendations for your stock tickers
 
 Market Mind AI is a powerful finance monitoring agent designed to help you analyze market sentiment and make personalized informed investing decisions.
 
 Market Mind AI uses advanced natural language processing (NLP) techniques to extract the most important insights based from social media and news articles.
 
-Quickly try it by inputting the stock ticker you're interested in and your personal investing or research goal.
+Quickly try it by inputting the stock tickers you're interested in and your personal investing or research goal.
 
 ## Analyze market sentiment for your ticker symbol
 
-1.  **Input Ticker**: Input the stock ticker (e.g., `TSLA`, `NVDA` or `MSFT`) to analyze current sentiment for the company of your interest.
+1.  **Input s**: Input the stock tickers (e.g., `TSLA`, `NVDA` or `MSFT`) to analyze current sentiment for the company of your interest.
 2.  **Define Persona**: Describe the type of investor you are (e.g., conservative, aggressive), risk tolerance, investing horizon, and use case for the analysis.
     This information helps tailor the analysis to your investing style.
 
-**Input field example:**
-![input fields example](./docs/img/input-fields-example.png)
 **Structured data input example:**
 
 ```json
 {
-    "ticker": "MSFT",
+    "tickers": ["MSFT"],
     "persona": "I'm a conservative investor with aiming for long-term investment horizon. I want to decide whether to buy more shares of Microsoft in the current market conditions."
 }
 ```

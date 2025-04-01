@@ -2,7 +2,7 @@
 import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
-import { isTickerValid, normalizeTicker } from './common.js';
+import { ERRORS, isTickerValid, normalizeTicker } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 
@@ -12,7 +12,7 @@ import { getGoogleNewsPosts } from './google.js';
 // import { router } from './routes.js';
 
 interface Input {
-    ticker: string;
+    tickers: string[];
     persona: string;
 }
 
@@ -24,21 +24,30 @@ await Actor.charge({ eventName: 'init' });
 const input = await Actor.getInput<Input>();
 
 if (!input) throw new Error('Input is missing!');
-else if (!(await isTickerValid(input.ticker))) throw new Error('Stock ticker is invalid!');
 
-const ticker = normalizeTicker(input.ticker);
+for (const ticker of input.tickers) {
+    if (await isTickerValid(ticker)) {
+        const normalizedTicker = normalizeTicker(ticker);
 
-const [google, twitter] = await Promise.all([
-    getGoogleNewsPosts(ticker),
-    getTwitterPosts(ticker),
-]);
+        const [google, twitter] = await Promise.all([
+            getGoogleNewsPosts(normalizedTicker),
+            getTwitterPosts(normalizedTicker),
+        ]);
 
-const response = await processPrompt(ticker, input.persona, { google, twitter });
+        const response = await processPrompt(normalizedTicker, input.persona, { google, twitter });
 
-if (response != null) {
-    // Save headings to Dataset - a table-like storage.
-    await Actor.pushData(response);
-    await Actor.charge({ eventName: 'analysis' });
+        if (response != null) {
+            // Save headings to Dataset - a table-like storage.
+            await Actor.pushData(response);
+            await Actor.charge({ eventName: 'analysis' });
+        } else {
+            console.warn(ERRORS.ANALYSIS_FAILED);
+            await Actor.pushData({ error: ERRORS.ANALYSIS_FAILED });
+        }
+    } else {
+        console.warn(ERRORS.INVALID_TICKER);
+        await Actor.pushData({ error: ERRORS.INVALID_TICKER });
+    }
 }
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().
