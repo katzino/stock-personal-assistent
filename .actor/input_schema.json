@@ -6,7 +6,7 @@
       "tickers": {
         "title": "Tickers",
         "type": "array",
-        "description": "The tickers of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks",
+        "description": "The tickers of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks. For cryptocurrency, check out https://coinmarketcap.com/all/views/all/.",
         "editor": "stringList",
         "prefill": ["TSLA"]
       },
