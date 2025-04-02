@@ -64,7 +64,9 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
         tools,
     });
 
-    const output: Record<string, unknown> = {};
+    const output: Record<string, unknown> = {
+        ticker,
+    };
 
     for (const tool of response.choices[0].message.tool_calls ?? []) {
         output[tool.function.name] = JSON.parse(tool.function.arguments);

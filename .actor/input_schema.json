@@ -3,12 +3,12 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-      "ticker": {
-        "title": "Ticker",
-        "type": "string",
-        "description": "The ticker of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks",
-        "editor": "textfield",
-        "prefill": "TSLA"
+      "tickers": {
+        "title": "Tickers",
+        "type": "array",
+        "description": "The tickers of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks",
+        "editor": "stringList",
+        "prefill": ["TSLA"]
       },
       "persona": {
         "title": "Persona",
@@ -18,5 +18,5 @@
         "prefill": "I'm a conservative investor with aiming for long-term investment horizon"
       }
     },
-    "required": ["ticker", "persona"]
+    "required": ["tickers", "persona"]
   }

@@ -2,7 +2,7 @@
 import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
-import { isTickerValid, normalizeTicker } from './common.js';
+import { ERRORS, isTickerValid, normalizeTicker } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 
@@ -12,7 +12,7 @@ import { getGoogleNewsPosts } from './google.js';
 // import { router } from './routes.js';
 
 interface Input {
-    ticker: string;
+    tickers: string[];
     persona: string;
 }
 
@@ -23,22 +23,33 @@ await Actor.charge({ eventName: 'init' });
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
 
-if (!input) throw new Error('Input is missing!');
-else if (!(await isTickerValid(input.ticker))) throw new Error('Stock ticker is invalid!');
+if (!input) throw new Error(ERRORS.INVALID_INPUT);
 
-const ticker = normalizeTicker(input.ticker);
+for (const inputTicker of input.tickers) {
+    if (await isTickerValid(inputTicker)) {
+        const ticker = normalizeTicker(inputTicker);
 
-const [google, twitter] = await Promise.all([
-    getGoogleNewsPosts(ticker),
-    getTwitterPosts(ticker),
-]);
+        const [google, twitter] = await Promise.all([
+            getGoogleNewsPosts(ticker),
+            getTwitterPosts(ticker),
+        ]);
 
-const response = await processPrompt(ticker, input.persona, { google, twitter });
+        const response = await processPrompt(ticker, input.persona, { google, twitter });
 
-if (response != null) {
-    // Save headings to Dataset - a table-like storage.
-    await Actor.pushData(response);
-    await Actor.charge({ eventName: 'analysis' });
+        if (response != null) {
+            // Save headings to Dataset - a table-like storage.
+            await Actor.pushData(response);
+            await Actor.charge({ eventName: 'analysis' });
+        } else {
+            console.warn(ERRORS.ANALYSIS_FAILED);
+            await Actor.pushData({ ticker, error: ERRORS.ANALYSIS_FAILED });
+        }
+    } else {
+        const message = ERRORS.INVALID_TICKER.format(inputTicker);
+
+        console.warn(message);
+        await Actor.pushData({ error: message });
+    }
 }
 
 // Gracefully exit the Actor process. It's recommended to quit all Actors with an exit().

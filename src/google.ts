@@ -25,7 +25,7 @@ export async function getGoogleNewsPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'google' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
-        await reportResearchData('google', run.defaultDatasetId);
+        await reportResearchData(ticker, 'google', run.defaultDatasetId);
 
         return normalizeGoogleNewsPost(items as GoogleNewsPostInput[]);
     }
