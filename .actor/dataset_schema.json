@@ -9,6 +9,9 @@
                 "items": {
                     "type": "object",
                     "properties": {
+                        "ticker": {
+                            "type": "string"
+                        },
                         "error": {
                             "type": "string"
                         },

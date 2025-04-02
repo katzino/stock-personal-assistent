@@ -23,18 +23,18 @@ await Actor.charge({ eventName: 'init' });
 // Structure of input is defined in input_schema.json
 const input = await Actor.getInput<Input>();
 
-if (!input) throw new Error('Input is missing!');
+if (!input) throw new Error(ERRORS.INVALID_INPUT);
 
-for (const ticker of input.tickers) {
-    if (await isTickerValid(ticker)) {
-        const normalizedTicker = normalizeTicker(ticker);
+for (const inputTicker of input.tickers) {
+    if (await isTickerValid(inputTicker)) {
+        const ticker = normalizeTicker(inputTicker);
 
         const [google, twitter] = await Promise.all([
-            getGoogleNewsPosts(normalizedTicker),
-            getTwitterPosts(normalizedTicker),
+            getGoogleNewsPosts(ticker),
+            getTwitterPosts(ticker),
         ]);
 
-        const response = await processPrompt(normalizedTicker, input.persona, { google, twitter });
+        const response = await processPrompt(ticker, input.persona, { google, twitter });
 
         if (response != null) {
             // Save headings to Dataset - a table-like storage.
@@ -42,11 +42,13 @@ for (const ticker of input.tickers) {
             await Actor.charge({ eventName: 'analysis' });
         } else {
             console.warn(ERRORS.ANALYSIS_FAILED);
-            await Actor.pushData({ error: ERRORS.ANALYSIS_FAILED });
+            await Actor.pushData({ ticker, error: ERRORS.ANALYSIS_FAILED });
         }
     } else {
-        console.warn(ERRORS.INVALID_TICKER);
-        await Actor.pushData({ error: ERRORS.INVALID_TICKER });
+        const message = ERRORS.INVALID_TICKER.format(inputTicker);
+
+        console.warn(message);
+        await Actor.pushData({ error: message });
     }
 }
 

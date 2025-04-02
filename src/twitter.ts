@@ -40,7 +40,7 @@ export async function getTwitterPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'twitter' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
-        await reportResearchData('twitter', run.defaultDatasetId);
+        await reportResearchData(ticker, 'twitter', run.defaultDatasetId);
 
         return normalizeTwitterPosts(items as TwitterPost[]);
     }
