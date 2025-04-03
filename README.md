@@ -14,7 +14,7 @@ Quickly try it by inputting the stock tickers you're interested in and your pers
 
 ## Analyze market sentiment for your ticker symbol
 
-1.  **Input Tickers**: Input the stock tickers (e.g., `["TSLA", "NVDA", "MSFT"]`) to analyze current sentiment for the company of your interest.
+1.  **Input Tickers**: Input the stock tickers (e.g., `["TSLA", "NVDA", "BTC"]`) to analyze current sentiment for the company or cryptocurrency of your interest.
 2.  **Define Persona**: Describe the type of investor you are (e.g., conservative, aggressive), risk tolerance, investing horizon, and use case for the analysis.
     This information helps tailor the analysis to your investing style.
 

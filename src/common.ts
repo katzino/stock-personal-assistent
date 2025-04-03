@@ -12,9 +12,30 @@ export const ERRORS = {
 export const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
 export async function isTickerValid(input: string) {
-    const response = await fetch(`https://finance.yahoo.com/quote/${stripTicker(input)}/`);
+    return (await Promise.all([
+        isCompanyStock(input),
+        isCryptoStock(input),
+    ])).some(Boolean);
+}
 
+async function isCompanyStock(input: string) {
+    const response = await fetch(`https://finance.yahoo.com/quote/${stripTicker(input)}/`);
     return response.status === 200 && !response.redirected;
+}
+
+async function isCryptoStock(input: string) {
+    try {
+        const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${stripTicker(input)}`);
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.code === '200000';
+        }
+
+        return false;
+    } catch {
+        return false;
+    }
 }
 
 function stripTicker(input: string) {
@@ -22,7 +43,7 @@ function stripTicker(input: string) {
 }
 
 export function normalizeTicker(input: string) {
-    return input.startsWith('$') ? input : `$${input}`;
+    return (input.startsWith('$') ? input : `$${input}`).toUpperCase();
 }
 
 const RESEARCH_STORE_ID = 'RESEARCH';
