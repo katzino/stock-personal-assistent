@@ -58,6 +58,7 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
                         The user persona is: ${persona}
                 
                         Provide an analysis in the requested format.
+                        You must always call all ${tools.length} functions: ${tools.map((tool) => tool.function.name).join(', ')}.
                     `,
             },
         ],
