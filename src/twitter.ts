@@ -1,5 +1,6 @@
 import { Actor } from 'apify';
 import { reportResearchData, RESEARCH_DEPTH, startDate } from './common.js';
+import type { Entity } from './common.js';
 
 export type TwitterPost = {
     author?: {
@@ -22,7 +23,7 @@ export type TwitterPost = {
     viewCount: number;
 };
 
-export async function getTwitterPosts(ticker: string) {
+export async function getTwitterPosts(entity: Entity) {
     const run = await Actor.call('61RPP7dywgiy0JPD0', {
         includeSearchTerms: true,
         maxItems: RESEARCH_DEPTH,
@@ -31,7 +32,7 @@ export async function getTwitterPosts(ticker: string) {
         onlyTwitterBlue: false,
         onlyVerifiedUsers: false,
         onlyVideo: false,
-        searchTerms: [ticker],
+        searchTerms: entity.name ? [entity.ticker, entity.name] : [entity.ticker],
         sort: 'Top',
         start: startDate,
         tweetLanguage: 'en',
@@ -40,7 +41,7 @@ export async function getTwitterPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'twitter' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
-        await reportResearchData(ticker, 'twitter', run.defaultDatasetId);
+        await reportResearchData(entity.ticker, 'twitter', run.defaultDatasetId);
 
         return normalizeTwitterPosts(items as TwitterPost[]);
     }

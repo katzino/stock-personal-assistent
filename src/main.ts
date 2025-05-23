@@ -2,7 +2,7 @@
 import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
-import { ERRORS, isTickerValid, normalizeTicker } from './common.js';
+import { ERRORS, validateEntity } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 
@@ -26,15 +26,15 @@ const input = await Actor.getInput<Input>();
 if (!input) throw new Error(ERRORS.INVALID_INPUT);
 
 for (const inputTicker of input.tickers) {
-    if (await isTickerValid(inputTicker)) {
-        const ticker = normalizeTicker(inputTicker);
+    const entity = await validateEntity(inputTicker);
 
+    if (entity != null) {
         const [google, twitter] = await Promise.all([
-            getGoogleNewsPosts(ticker),
-            getTwitterPosts(ticker),
+            getGoogleNewsPosts(entity),
+            getTwitterPosts(entity),
         ]);
 
-        const response = await processPrompt(ticker, input.persona, { google, twitter });
+        const response = await processPrompt(entity, input.persona, { google, twitter });
 
         if (response != null) {
             // Save headings to Dataset - a table-like storage.
@@ -42,7 +42,7 @@ for (const inputTicker of input.tickers) {
             await Actor.charge({ eventName: 'analysis' });
         } else {
             console.warn(ERRORS.ANALYSIS_FAILED);
-            await Actor.pushData({ ticker, error: ERRORS.ANALYSIS_FAILED });
+            await Actor.pushData({ ticker: entity.ticker, error: ERRORS.ANALYSIS_FAILED });
         }
     } else {
         const message = ERRORS.INVALID_TICKER.format(inputTicker);

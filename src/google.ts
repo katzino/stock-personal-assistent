@@ -1,5 +1,6 @@
 import { Actor } from 'apify';
 import { reportResearchData, RESEARCH_DEPTH } from './common.js';
+import type { Entity } from './common.js';
 
 type GoogleNewsPostInput = {
     Title: string;
@@ -15,9 +16,9 @@ export type GoogleNewsPost = {
     date: string;
 };
 
-export async function getGoogleNewsPosts(ticker: string) {
+export async function getGoogleNewsPosts(entity: Entity) {
     const run = await Actor.call('KIe0dFDnUt4mqQyVI', {
-        keyword: ticker,
+        keyword: entity.name ? [entity.ticker, entity.name].join(', ') : entity.ticker,
         maxitems: RESEARCH_DEPTH,
         time_filter: 'Less than a month 🗓️',
     });
@@ -25,7 +26,7 @@ export async function getGoogleNewsPosts(ticker: string) {
     if (run.status === 'SUCCEEDED') {
         await Actor.charge({ eventName: 'google' });
         const { items } = (await Actor.apifyClient.dataset(run.defaultDatasetId).listItems());
-        await reportResearchData(ticker, 'google', run.defaultDatasetId);
+        await reportResearchData(entity.ticker, 'google', run.defaultDatasetId);
 
         return normalizeGoogleNewsPost(items as GoogleNewsPostInput[]);
     }

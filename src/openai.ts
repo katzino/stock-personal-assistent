@@ -3,6 +3,7 @@ import type { ChatCompletionTool } from 'openai/resources';
 
 import type { TwitterPost } from './twitter.js';
 import type { GoogleNewsPost } from './google.js';
+import type { Entity } from './common.js';
 
 type ScrapedSource = keyof ScrapedData;
 type ScrapedData = {
@@ -16,7 +17,7 @@ type ToolParameters = {
     required: ScrapedSource[];
 };
 
-export async function processPrompt(ticker: string, persona: string, data: ScrapedData) {
+export async function processPrompt(entity: Entity, persona: string, data: ScrapedData) {
     const tools = getTools(data);
 
     if (tools == null) return null;
@@ -53,7 +54,7 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
                 role: 'user',
                 content:
                     `
-                        You will be conducting recommandation for ${ticker}.
+                        You will be conducting recommandation for ${entity.ticker}.
                         Here is the financial dataset:\n${JSON.stringify(data, null, 2)}
                         The user persona is: ${persona}
                 
@@ -66,7 +67,7 @@ export async function processPrompt(ticker: string, persona: string, data: Scrap
     });
 
     const output: Record<string, unknown> = {
-        ticker,
+        ticker: entity.ticker,
     };
 
     for (const tool of response.choices[0].message.tool_calls ?? []) {

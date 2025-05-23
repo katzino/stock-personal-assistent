@@ -11,30 +11,97 @@ export const ERRORS = {
 
 export const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
-export async function isTickerValid(input: string) {
-    return (await Promise.all([
-        isCompanyStock(input),
-        isCryptoStock(input),
-    ])).some(Boolean);
+export type Entity = {
+    ticker: string;
+    name: string | null;
 }
 
-async function isCompanyStock(input: string) {
-    const response = await fetch(`https://finance.yahoo.com/quote/${stripTicker(input)}/`);
-    return response.status === 200 && !response.redirected;
+export async function validateEntity(input: string): Promise<Entity | null> {
+    const symbol = stripTicker(input);
+
+    const [company, crypto] = await Promise.all([
+        isCompanyStock(symbol),
+        isCryptoStock(symbol),
+    ]);
+
+    return company ?? crypto;
 }
 
-async function isCryptoStock(input: string) {
+async function isCompanyStock(symbol: string): Promise<Entity | null> {
+    const response = await fetch(`https://finance.yahoo.com/quote/${symbol}/`);
+
+    if (response.status === 200 && !response.redirected) {
+        const body = await response.text();
+        const match = body.match(/"shortName\\":\\"(.*?)\\"/) ?? [];
+        const name = match[1] !== null ? normalizeCompanyName(match[1]) : null;
+
+        return {
+            ticker: normalizeTicker(symbol),
+            name: name !== symbol ? name : null,
+        };
+    }
+
+    return null;
+}
+
+const BLACKLISTED_COMPANY_PHRASES = [
+    ' & co.',
+    ' & company',
+    ' co.',
+    ' company',
+    ' corp.',
+    ' corporation',
+    ' company',
+    ' companies',
+    ' enterprise',
+    ' global',
+    ' group',
+    ' holdings',
+    ' inc',
+    ' international',
+    ' llc',
+    ' ltd',
+    ' partners',
+    ' plc',
+    ' technologies',
+];
+
+function normalizeCompanyName(input: string) {
     try {
-        const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${stripTicker(input)}`);
+        let output = input.split(', ')[0];
 
-        if (response.ok) {
-            const data = await response.json();
-            return data.code === '200000';
+        for (const phrase of BLACKLISTED_COMPANY_PHRASES) {
+            const index = input.toLowerCase().indexOf(phrase);
+
+            if (index >= 0) {
+                output = output.slice(0, index);
+            }
         }
 
-        return false;
+        return output;
+    } catch (error) {
+        return input;
+    }
+}
+
+async function isCryptoStock(symbol: string): Promise<Entity | null> {
+    try {
+        const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${symbol}`);
+
+        if (response.ok) {
+            const { code, data } = await response.json();
+
+            if (code === '200000') {
+                return {
+                    ticker: normalizeTicker(symbol),
+                    name: data.fullName !== symbol ? data.fullName : null,
+                };
+            }
+        }
+
+        return null;
     } catch {
-        return false;
+        return null;
     }
 }
 
@@ -42,7 +109,7 @@ function stripTicker(input: string) {
     return input.startsWith('$') ? input.slice(1) : input;
 }
 
-export function normalizeTicker(input: string) {
+function normalizeTicker(input: string) {
     return (input.startsWith('$') ? input : `$${input}`).toUpperCase();
 }
 
