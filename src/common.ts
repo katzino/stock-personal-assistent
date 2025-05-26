@@ -1,6 +1,11 @@
 import { KeyValueStore } from 'apify';
 import dayjs from 'dayjs';
 
+export type Input = {
+    tickers: string[];
+    persona: string;
+}
+
 export const ERRORS = {
     INVALID_INPUT: 'Input is invalid!',
     INVALID_TICKER: {
