@@ -3,7 +3,7 @@ import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
 import type { Input } from './common.js';
-import { ERRORS, validateEntity } from './common.js';
+import { ERRORS, validateEntity, validateSources } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 import { logApifyRun } from './apify.js';
@@ -22,6 +22,10 @@ const input = await Actor.getInput<Input>();
 
 if (!input) throw new Error(ERRORS.INVALID_INPUT);
 
+const sources = validateSources(input.sources ?? []);
+
+if (sources.length === 0) throw new Error(ERRORS.INVALID_SOURCE);
+
 for (const inputTicker of input.tickers) {
     const entity = await validateEntity(inputTicker);
 
@@ -29,8 +33,8 @@ for (const inputTicker of input.tickers) {
 
     if (entity != null) {
         const [google, twitter] = await Promise.all([
-            getGoogleNewsPosts(entity),
-            getTwitterPosts(entity),
+            sources.includes('google') ? getGoogleNewsPosts(entity) : null,
+            sources.includes('twitter') ? getTwitterPosts(entity) : null,
         ]);
 
         const response = await processPrompt(entity, input.persona, { google, twitter });

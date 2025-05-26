@@ -3,9 +3,8 @@ import type { ChatCompletionTool } from 'openai/resources';
 
 import type { TwitterPost } from './twitter.js';
 import type { GoogleNewsPost } from './google.js';
-import type { Entity } from './common.js';
+import type { Entity, Source } from './common.js';
 
-type ScrapedSource = keyof ScrapedData;
 type ScrapedData = {
     google: GoogleNewsPost[] | null;
     twitter: TwitterPost[] | null;
@@ -13,8 +12,8 @@ type ScrapedData = {
 
 type ToolParameters = {
     type: 'object';
-    properties: Partial<Record<ScrapedSource, unknown>>;
-    required: ScrapedSource[];
+    properties: Partial<Record<Source, unknown>>;
+    required: Source[];
 };
 
 export async function processPrompt(entity: Entity, persona: string, data: ScrapedData) {
@@ -84,10 +83,30 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
         required: [],
     };
 
+    const sentiment: ChatCompletionTool = {
+        type: 'function',
+        function: {
+            name: 'sentiment_analysis',
+            description: 'Analyze sentiment for the given ticker based on market data for each dataset separately.',
+            parameters: {
+                type: 'object',
+                properties: {},
+                required: [],
+            },
+        },
+    };
+
     Object.keys(data).forEach((key) => {
-        if (data[key as ScrapedSource] != null) {
-            parameters.properties[key as ScrapedSource] = analysis;
-            parameters.required.push(key as ScrapedSource);
+        const source = key as Source;
+
+        if (data[source] != null) {
+            parameters.properties[source] = analysis;
+            parameters.required.push(source);
+
+            // @ts-expect-error: mute TypeScript error about dynamic property assignment
+            sentiment.function.parameters.properties[source] = analysis;
+            // @ts-expect-error: mute TypeScript error about dynamic property assignment
+            sentiment.function.parameters.required.push(source);
         }
     });
 
@@ -96,21 +115,7 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
     }
 
     return [
-        {
-            type: 'function',
-            function: {
-                name: 'sentiment_analysis',
-                description: 'Analyze sentiment for the given ticker based on market data for each dataset separately.',
-                parameters: {
-                    type: 'object',
-                    properties: {
-                        google: analysis,
-                        twitter: analysis,
-                    },
-                    required: ['google', 'twitter'],
-                },
-            },
-        },
+        sentiment,
         {
             type: 'function',
             function: {

@@ -16,6 +16,19 @@
         "description": "Describe whom the recommendation is targeted for",
         "editor": "textarea",
         "prefill": "I'm a conservative investor with aiming for long-term investment horizon"
+      },
+      "sources": {
+        "title": "Sources",
+        "description": "Select from available data sources to base the analysis on. At least one source is required.",
+        "type": "array",
+        "editor": "select",
+        "items": {
+          "type": "string",
+          "enum": ["google", "twitter"],
+          "enumTitles": ["Google", "Twitter (X)"]
+        },
+        "prefill": ["google", "twitter"],
+        "uniqueItems": true
       }
     },
     "required": ["tickers", "persona"]

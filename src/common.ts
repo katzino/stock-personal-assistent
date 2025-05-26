@@ -1,13 +1,26 @@
 import { KeyValueStore } from 'apify';
 import dayjs from 'dayjs';
 
+export type Source = 'google' | 'twitter';
+const SOURCES: Source[] = ['google', 'twitter'];
+
+export function validateSources(input: string[]): Source[] {
+    if (input.length === 0) {
+        return SOURCES;
+    }
+
+    return input.filter((source) => SOURCES.includes(source as Source)) as Source[];
+}
+
 export type Input = {
     tickers: string[];
     persona: string;
+    sources?: Source[];
 }
 
 export const ERRORS = {
     INVALID_INPUT: 'Input is invalid!',
+    INVALID_SOURCE: `No valid source provided! Valid sources are: ${SOURCES.join(', ')}.`,
     INVALID_TICKER: {
         format: (input: string) => `${input} is invalid stock ticker!`,
     },
