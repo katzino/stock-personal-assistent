@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { reportResearchData, RESEARCH_DEPTH, startDate } from './common.js';
+import { getResearchKeywords, reportResearchData, RESEARCH_DEPTH, startDate } from './common.js';
 import type { Entity } from './common.js';
 
 export type TwitterPost = {
@@ -32,7 +32,7 @@ export async function getTwitterPosts(entity: Entity) {
         onlyTwitterBlue: false,
         onlyVerifiedUsers: false,
         onlyVideo: false,
-        searchTerms: entity.name ? [entity.ticker, entity.name] : [entity.ticker],
+        searchTerms: getResearchKeywords(entity),
         sort: 'Top',
         start: startDate,
         tweetLanguage: 'en',

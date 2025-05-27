@@ -13,7 +13,8 @@ export function validateSources(input: string[]): Source[] {
 }
 
 export type Input = {
-    tickers: string[];
+    companies?: string[];
+    cryptocurrencies?: string[];
     persona: string;
     sources?: Source[];
 }
@@ -30,19 +31,43 @@ export const ERRORS = {
 export const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
 export type Entity = {
+    type: 'company' | 'cryptocurrency';
     ticker: string;
     name: string | null;
+    isOverflowing?: boolean;
 }
 
-export async function validateEntity(input: string): Promise<Entity | null> {
-    const symbol = stripTicker(input);
+type EntityResponse = {
+    inputTicker: string;
+    entity: Entity | null;
+};
 
-    const [company, crypto] = await Promise.all([
-        isCompanyStock(symbol),
-        isCryptoStock(symbol),
-    ]);
+export async function validateEntities(companies: string[], cryptocurrencies: string[]): Promise<EntityResponse[]> {
+    const entities: EntityResponse[] = [];
 
-    return company ?? crypto;
+    for (const inputTicker of companies) {
+        const symbol = stripTicker(inputTicker);
+        const entity = await isCompanyStock(symbol);
+
+        if (entity != null) {
+            entity.isOverflowing = await isCryptocurrencyStock(symbol) != null;
+        }
+
+        entities.push({ inputTicker, entity });
+    }
+
+    for (const inputTicker of cryptocurrencies) {
+        const symbol = stripTicker(inputTicker);
+        const entity = await isCryptocurrencyStock(symbol);
+
+        if (entity != null) {
+            entity.isOverflowing = await isCompanyStock(symbol) != null;
+        }
+
+        entities.push({ inputTicker, entity });
+    }
+
+    return entities;
 }
 
 async function isCompanyStock(symbol: string): Promise<Entity | null> {
@@ -50,10 +75,11 @@ async function isCompanyStock(symbol: string): Promise<Entity | null> {
 
     if (response.status === 200 && !response.redirected) {
         const body = await response.text();
-        const match = body.match(/"shortName\\":\\"(.*?)\\"/) ?? [];
+        const match = body.match(/"shortName\\":\\"(.*?)( \(?)\\"/) ?? [];
         const name = match[1] !== null ? normalizeCompanyName(match[1]) : null;
 
         return {
+            type: 'company',
             ticker: normalizeTicker(symbol),
             name: name !== symbol ? name : null,
         };
@@ -102,7 +128,7 @@ function normalizeCompanyName(input: string) {
     }
 }
 
-async function isCryptoStock(symbol: string): Promise<Entity | null> {
+async function isCryptocurrencyStock(symbol: string): Promise<Entity | null> {
     try {
         const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${symbol}`);
 
@@ -111,6 +137,7 @@ async function isCryptoStock(symbol: string): Promise<Entity | null> {
 
             if (code === '200000') {
                 return {
+                    type: 'cryptocurrency',
                     ticker: normalizeTicker(symbol),
                     name: data.fullName !== symbol ? data.fullName : null,
                 };
@@ -133,6 +160,18 @@ function normalizeTicker(input: string) {
 
 const RESEARCH_STORE_ID = 'RESEARCH';
 export const RESEARCH_DEPTH = 50;
+
+export function getResearchKeywords(entity: Entity) {
+    if (entity.name) {
+        if (entity.isOverflowing) {
+            return [entity.name];
+        }
+
+        return [entity.ticker, entity.name];
+    }
+
+    return [entity.ticker];
+}
 
 export async function reportResearchData(ticker: string, source: string, datasetId: string) {
     const value: Record<string, unknown> = await KeyValueStore.getValue(RESEARCH_STORE_ID) ?? {};

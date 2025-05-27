@@ -22,7 +22,8 @@ Quickly try it by inputting the stock tickers you're interested in and your pers
 
 ```json
 {
-    "tickers": ["MSFT"],
+    "companies": ["MSFT"],
+    "cryptocurrencies": ["ETH"],
     "persona": "I'm a conservative investor with aiming for long-term investment horizon. I want to decide whether to buy more shares of Microsoft in the current market conditions."
 }
 ```

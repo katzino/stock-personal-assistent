@@ -3,7 +3,7 @@ import { Actor } from 'apify';
 
 import { getTwitterPosts } from './twitter.js';
 import type { Input } from './common.js';
-import { ERRORS, validateEntity, validateSources } from './common.js';
+import { ERRORS, validateEntities, validateSources } from './common.js';
 import { processPrompt } from './openai.js';
 import { getGoogleNewsPosts } from './google.js';
 import { logApifyRun } from './apify.js';
@@ -26,9 +26,9 @@ const sources = validateSources(input.sources ?? []);
 
 if (sources.length === 0) throw new Error(ERRORS.INVALID_SOURCE);
 
-for (const inputTicker of input.tickers) {
-    const entity = await validateEntity(inputTicker);
+const entities = await validateEntities(input.companies ?? [], input.cryptocurrencies ?? []);
 
+for (const { inputTicker, entity } of entities) {
     await logApifyRun(input, entity);
 
     if (entity != null) {
@@ -45,7 +45,7 @@ for (const inputTicker of input.tickers) {
             await Actor.charge({ eventName: 'analysis' });
         } else {
             console.warn(ERRORS.ANALYSIS_FAILED);
-            await Actor.pushData({ ticker: entity.ticker, error: ERRORS.ANALYSIS_FAILED });
+            await Actor.pushData({ type: entity.type, ticker: entity.ticker, error: ERRORS.ANALYSIS_FAILED });
         }
     } else {
         const message = ERRORS.INVALID_TICKER.format(inputTicker);

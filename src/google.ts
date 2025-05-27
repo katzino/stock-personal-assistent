@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { reportResearchData, RESEARCH_DEPTH } from './common.js';
+import { getResearchKeywords, reportResearchData, RESEARCH_DEPTH } from './common.js';
 import type { Entity } from './common.js';
 
 type GoogleNewsPostInput = {
@@ -18,7 +18,7 @@ export type GoogleNewsPost = {
 
 export async function getGoogleNewsPosts(entity: Entity) {
     const run = await Actor.call('KIe0dFDnUt4mqQyVI', {
-        keyword: entity.name ? [entity.ticker, entity.name].join(', ') : entity.ticker,
+        keyword: getResearchKeywords(entity).join(', '),
         maxitems: RESEARCH_DEPTH,
         time_filter: 'Less than a month 🗓️',
     });

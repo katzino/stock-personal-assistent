@@ -53,7 +53,8 @@ export async function processPrompt(entity: Entity, persona: string, data: Scrap
                 role: 'user',
                 content:
                     `
-                        You will be conducting recommandation for ${entity.ticker}.
+                        You will be conducting recommandation for ${entity.ticker} ${entity.type}.
+                        You might encounter various sources of data, ignore those that don't refer to given ${entity.type}.
                         Here is the financial dataset:\n${JSON.stringify(data, null, 2)}
                         The user persona is: ${persona}
                 
@@ -66,6 +67,7 @@ export async function processPrompt(entity: Entity, persona: string, data: Scrap
     });
 
     const output: Record<string, unknown> = {
+        type: entity.type,
         ticker: entity.ticker,
     };
 

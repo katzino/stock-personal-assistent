@@ -3,12 +3,19 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-      "tickers": {
-        "title": "Tickers",
+      "companies": {
+        "title": "Company stock tickers",
         "type": "array",
-        "description": "The tickers of the stock to analyze (e.g. TSLA, AAPL, AMZN). Find stock ticker at https://stockanalysis.com/stocks. For cryptocurrency, check out https://coinmarketcap.com/all/views/all/.",
+        "description": "The tickers of the company stock to analyze (e.g. TSLA, AAPL, AMZN). Find ticker at https://stockanalysis.com/stocks.",
         "editor": "stringList",
         "prefill": ["TSLA"]
+      },
+      "cryptocurrencies": {
+        "title": "Cryptocurrency tickers",
+        "type": "array",
+        "description": "The tickers of the cryptocurrency to analyze (e.g. BTC, ETH, DOGE). Find ticker at https://coinmarketcap.com/all/views/all/.",
+        "editor": "stringList",
+        "prefill": ["BTC"]
       },
       "persona": {
         "title": "Persona",
@@ -31,5 +38,5 @@
         "uniqueItems": true
       }
     },
-    "required": ["tickers", "persona"]
+    "required": ["persona"]
   }
