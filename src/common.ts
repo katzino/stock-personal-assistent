@@ -75,13 +75,16 @@ async function isCompanyStock(symbol: string): Promise<Entity | null> {
 
     if (response.status === 200 && !response.redirected) {
         const body = await response.text();
-        const match = body.match(/"shortName\\":\\"(.*?)( \(?)\\"/) ?? [];
+        const match = body.match(new RegExp(`<title>(.*?)\\(${symbol}\\)?.*<\\/title>`)) ?? [];
         const name = match[1] !== null ? normalizeCompanyName(match[1]) : null;
+        const ticker = normalizeTicker(symbol);
+
+        console.log(symbol, name);
 
         return {
             type: 'company',
-            ticker: normalizeTicker(symbol),
-            name: name !== symbol ? name : null,
+            ticker,
+            name: name?.toUpperCase() !== symbol ? name : null,
         };
     }
 
@@ -90,7 +93,11 @@ async function isCompanyStock(symbol: string): Promise<Entity | null> {
 
 const BLACKLISTED_COMPANY_PHRASES = [
     ' & co.',
+    ' &amp; co.',
     ' & company',
+    ' &amp; company',
+    ' and co.',
+    ' and company',
     ' co.',
     ' company',
     ' corp.',
@@ -99,27 +106,46 @@ const BLACKLISTED_COMPANY_PHRASES = [
     ' companies',
     ' enterprise',
     ' global',
-    ' group',
-    ' holdings',
     ' inc',
-    ' international',
+    ' incorporated',
     ' llc',
     ' ltd',
     ' partners',
     ' plc',
     ' technologies',
+    '.com',
+];
+
+const BLACKLISTED_COMPANY_PREFIXES = [
+    'the ',
+    'a ',
+    'an ',
+];
+
+const COMPANY_TRANSFORMATIONS: Array<[RegExp, string]> = [
+    [/&amp;/g, '&'], // Replace &amp; with &
 ];
 
 function normalizeCompanyName(input: string) {
     try {
-        let output = input.split(', ')[0];
+        let [output] = input.split(', ');
+
+        for (const prefix of BLACKLISTED_COMPANY_PREFIXES) {
+            if (output.toLowerCase().startsWith(prefix)) {
+                output = output.slice(prefix.length);
+            }
+        }
 
         for (const phrase of BLACKLISTED_COMPANY_PHRASES) {
-            const index = input.toLowerCase().indexOf(phrase);
+            const index = output.toLowerCase().indexOf(phrase);
 
             if (index >= 0) {
                 output = output.slice(0, index);
             }
+        }
+
+        for (const [regex, replacement] of COMPANY_TRANSFORMATIONS) {
+            output = output.replace(regex, replacement);
         }
 
         return output;
@@ -136,10 +162,12 @@ async function isCryptocurrencyStock(symbol: string): Promise<Entity | null> {
             const { code, data } = await response.json();
 
             if (code === '200000') {
+                const ticker = normalizeTicker(symbol);
+
                 return {
                     type: 'cryptocurrency',
-                    ticker: normalizeTicker(symbol),
-                    name: data.fullName !== symbol ? data.fullName : null,
+                    ticker,
+                    name: data.fullName.toUpperCase() !== ticker ? data.fullName : null,
                 };
             }
         }
