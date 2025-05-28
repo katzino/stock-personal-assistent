@@ -79,8 +79,6 @@ async function isCompanyStock(symbol: string): Promise<Entity | null> {
         const name = match[1] !== null ? normalizeCompanyName(match[1]) : null;
         const ticker = normalizeTicker(symbol);
 
-        console.log(symbol, name);
-
         return {
             type: 'company',
             ticker,
@@ -99,18 +97,15 @@ const BLACKLISTED_COMPANY_PHRASES = [
     ' and co.',
     ' and company',
     ' co.',
-    ' company',
+    ' companies',
     ' corp.',
     ' corporation',
-    ' company',
-    ' companies',
     ' enterprise',
-    ' global',
     ' inc',
+    ' inc.',
     ' incorporated',
     ' llc',
     ' ltd',
-    ' partners',
     ' plc',
     ' technologies',
     '.com',
@@ -139,7 +134,9 @@ function normalizeCompanyName(input: string) {
         for (const phrase of BLACKLISTED_COMPANY_PHRASES) {
             const index = output.toLowerCase().indexOf(phrase);
 
-            if (index >= 0) {
+            // it should look for an exact match of the phrase
+            // it can either be at the end of the string or followed by a space
+            if (index >= 0 && output.charAt(index + phrase.length).trim() === '') {
                 output = output.slice(0, index);
             }
         }
