@@ -71,23 +71,34 @@ export async function validateEntities(companies: string[], cryptocurrencies: st
 }
 
 async function isCompanyStock(symbol: string): Promise<Entity | null> {
-    const response = await fetch(`https://finance.yahoo.com/quote/${symbol}/`);
+    try {
+        const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1mo`);
 
-    if (response.status === 200 && !response.redirected) {
-        const body = await response.text();
-        const match = body.match(new RegExp(`<title>(.*?)\\(${symbol}\\)?.*<\\/title>`)) ?? [];
-        const name = match[1] !== null ? normalizeCompanyName(match[1]) : null;
-        const ticker = normalizeTicker(symbol);
+        if (response.ok) {
+            const { chart } = await response.json();
 
-        return {
-            type: 'company',
-            ticker,
-            name: name?.toUpperCase() !== symbol ? name : null,
-        };
-    }
+            if (chart.result && chart.result[0]) {
+                const result = chart.result[0] as CompanyChartData;
+                const name = normalizeCompanyName(result.meta.longName);
+                const ticker = normalizeTicker(symbol);
+
+                return {
+                    type: 'company',
+                    ticker,
+                    name: name?.toUpperCase() !== symbol ? name : null,
+                };
+            }
+        }
+    } catch (error) { /**/ }
 
     return null;
 }
+
+type CompanyChartData = {
+    meta: {
+        longName: string;
+    };
+};
 
 const BLACKLISTED_COMPANY_PHRASES = [
     ' & co.',
