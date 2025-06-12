@@ -34,7 +34,7 @@ export async function getTwitterPosts(entity: Entity) {
         onlyVideo: false,
         searchTerms: getResearchKeywords(entity),
         sort: 'Top',
-        start: startDate,
+        start: startDate.format('YYYY-MM-DD'),
         tweetLanguage: 'en',
     });
 

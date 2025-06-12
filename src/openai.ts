@@ -55,7 +55,8 @@ export async function processPrompt(entity: Entity, persona: string, data: Scrap
                     `
                         You will be conducting recommandation for ${entity.ticker} ${entity.type}.
                         You might encounter various sources of data, ignore those that don't refer to given ${entity.type}.
-                        Here is the financial dataset:\n${JSON.stringify(data, null, 2)}
+                        ${entity.priceChart.length > 0 ? `Here is the financial dataset: \n${JSON.stringify(entity.priceChart, null, 2)}` : ''}
+                        Here is the news dataset: \n${JSON.stringify(data, null, 2)}
                         The user persona is: ${persona}
                 
                         Provide an analysis in the requested format.
@@ -122,7 +123,11 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
             type: 'function',
             function: {
                 name: 'market_summary',
-                description: 'Provide a market summary of the given ticker. Prioritize those resources based on user\'s persona and usecase.',
+                description: `
+                Provide a market summary of the given ticker.
+                Prioritize those resources based on user's persona and usecase.
+                Also if market price data is available, include price specifics in the summary.
+                `,
                 parameters: {
                     type: 'object',
                     properties: {
@@ -142,6 +147,7 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                 description: `
                     Provide a personalized investment recommendation based on the user persona and usecase.
                     Do not focus on generic information, be as actionable and specific as possible.
+                    If price data is available, include it in the recommendation.
                     Also adjust your language and reasoning so it corresponds with user's persona.
                 `,
                 parameters: {

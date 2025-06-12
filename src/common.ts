@@ -28,12 +28,16 @@ export const ERRORS = {
     ANALYSIS_FAILED: 'Analysis failed!',
 };
 
-export const startDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
+export const startDate = dayjs().add(-1, 'month');
 
 export type Entity = {
     type: 'company' | 'cryptocurrency';
     ticker: string;
     name: string | null;
+    priceChart: Array<{
+        date: string;
+        price: number;
+    }>;
     isOverflowing?: boolean;
 }
 
@@ -86,6 +90,7 @@ async function isCompanyStock(symbol: string): Promise<Entity | null> {
                     type: 'company',
                     ticker,
                     name: name?.toUpperCase() !== symbol ? name : null,
+                    priceChart: getCompanyPriceChart(result),
                 };
             }
         }
@@ -98,7 +103,30 @@ type CompanyChartData = {
     meta: {
         longName: string;
     };
+    timestamp: number[];
+    indicators: {
+        adjclose: Array<{
+            adjclose: number[];
+        }>;
+    }
 };
+
+function getCompanyPriceChart(data: CompanyChartData): Entity['priceChart'] {
+    try {
+        const { adjclose = [] } = data.indicators.adjclose[0] ?? {};
+
+        return data.timestamp.map((timestamp, index) => {
+            const date = dayjs.unix(timestamp).format('YYYY-MM-DD');
+
+            return {
+                date,
+                price: adjclose[index],
+            };
+        });
+    } catch (error) {
+        return [];
+    }
+}
 
 const BLACKLISTED_COMPANY_PHRASES = [
     ' & co.',
@@ -164,18 +192,20 @@ function normalizeCompanyName(input: string) {
 
 async function isCryptocurrencyStock(symbol: string): Promise<Entity | null> {
     try {
-        const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${symbol}`);
+        const [currency, quote] = symbol.split('-');
+        const response = await fetch(`https://api.kucoin.com/api/v1/currencies/${currency}`);
 
         if (response.ok) {
             const { code, data } = await response.json();
 
             if (code === '200000') {
-                const ticker = normalizeTicker(symbol);
+                const ticker = normalizeTicker(currency);
 
                 return {
                     type: 'cryptocurrency',
                     ticker,
                     name: data.fullName.toUpperCase() !== ticker ? data.fullName : null,
+                    priceChart: await getCryptocurrencyPriceChart(currency, quote),
                 };
             }
         }
@@ -184,6 +214,37 @@ async function isCryptocurrencyStock(symbol: string): Promise<Entity | null> {
     } catch {
         return null;
     }
+}
+
+const SUPPORTED_CRYPTO_QUOTES = ['USDT', 'USDC', 'BTC', 'ETH', 'KCS', 'EUR', 'TRX'];
+
+async function getCryptocurrencyPriceChart(currency: string, quoteInput: string | null): Promise<Entity['priceChart']> {
+    const index = quoteInput ? SUPPORTED_CRYPTO_QUOTES.indexOf(quoteInput.toUpperCase()) : -1;
+    const quotes = index >= 0 ? [SUPPORTED_CRYPTO_QUOTES[index]] : SUPPORTED_CRYPTO_QUOTES;
+
+    for (const quote of quotes) {
+        try {
+            const response = await fetch(`https://api.kucoin.com/api/v1/market/candles?symbol=${currency}-${quote}&type=1day&startAt=${startDate.unix()}`);
+
+            if (response.ok) {
+                const { code, data } = await response.json();
+
+                if (code === '200000') {
+                    return data.map((item: string[]) => {
+                        const [timestamp, close] = item;
+                        const date = dayjs.unix(Number(timestamp)).format('YYYY-MM-DD');
+
+                        return {
+                            date,
+                            price: Number(close),
+                        };
+                    });
+                }
+            }
+        } catch (error) { /**/ }
+    }
+
+    return [];
 }
 
 function stripTicker(input: string) {
