@@ -11,5 +11,11 @@
 	"storages": {
 		"dataset": "./dataset_schema.json"
 	},
-	"dockerfile": "./Dockerfile"
+	"dockerfile": "./Dockerfile",
+	"actorAccess": {
+		"actorRun": [
+			"61RPP7dywgiy0JPD0",
+			"KIe0dFDnUt4mqQyVI"
+		]
+	}
 }
