@@ -78,16 +78,56 @@
             "display": {
                 "component": "table",
                 "properties": {
-                    "ticker": { "label": "Ticker", "format": "text" },
-                    "type": { "label": "Type", "format": "text" },
-                    "sentiment_analysis.google.category": { "label": "Google sentiment", "format": "text" },
-                    "sentiment_analysis.google.sentiment_score": { "label": "Google score", "format": "number" },
-                    "sentiment_analysis.twitter.category": { "label": "Twitter sentiment", "format": "text" },
-                    "sentiment_analysis.twitter.sentiment_score": { "label": "Twitter score", "format": "number" },
-                    "market_summary.current_situation": { "label": "Market situation", "format": "text" },
-                    "personalized_recommendation.action": { "label": "Recommendation", "format": "text" },
-                    "personalized_recommendation.summary": { "label": "Recommendation summary", "format": "text" },
-                    "error": { "label": "Error", "format": "text" }
+                    "ticker": {
+                        "label": "Ticker",
+                        "format": "text",
+                        "description": "Stock or cryptocurrency ticker symbol analyzed."
+                    },
+                    "type": {
+                        "label": "Type",
+                        "format": "text",
+                        "description": "Entity type — either 'company' or 'cryptocurrency'."
+                    },
+                    "sentiment_analysis.google.category": {
+                        "label": "Google sentiment",
+                        "format": "text",
+                        "description": "Sentiment category derived from Google News articles (Positive, Neutral, or Negative)."
+                    },
+                    "sentiment_analysis.google.sentiment_score": {
+                        "label": "Google score",
+                        "format": "number",
+                        "description": "Numeric sentiment score from Google News on a 0 (most negative) to 10 (most positive) scale."
+                    },
+                    "sentiment_analysis.twitter.category": {
+                        "label": "Twitter sentiment",
+                        "format": "text",
+                        "description": "Sentiment category derived from X (Twitter) posts (Positive, Neutral, or Negative)."
+                    },
+                    "sentiment_analysis.twitter.sentiment_score": {
+                        "label": "Twitter score",
+                        "format": "number",
+                        "description": "Numeric sentiment score from X (Twitter) on a 0 (most negative) to 10 (most positive) scale."
+                    },
+                    "market_summary.current_situation": {
+                        "label": "Market situation",
+                        "format": "text",
+                        "description": "Short summary of the current market situation for the ticker."
+                    },
+                    "personalized_recommendation.action": {
+                        "label": "Recommendation",
+                        "format": "text",
+                        "description": "Personalized actionable recommendation — Buy, Hold, or Sell."
+                    },
+                    "personalized_recommendation.summary": {
+                        "label": "Recommendation summary",
+                        "format": "text",
+                        "description": "Recommendation summary tailored to the user's persona, risk tolerance, and investment horizon."
+                    },
+                    "error": {
+                        "label": "Error",
+                        "format": "text",
+                        "description": "Error message populated when analysis for this ticker could not be completed."
+                    }
                 }
             }
         }
