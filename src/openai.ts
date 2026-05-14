@@ -91,10 +91,12 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
         function: {
             name: 'sentiment_analysis',
             description: 'Analyze sentiment for the given ticker based on market data for each dataset separately.',
+            strict: true,
             parameters: {
                 type: 'object',
                 properties: {},
                 required: [],
+                additionalProperties: false,
             },
         },
     };
@@ -128,6 +130,7 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                 Prioritize those resources based on user's persona and usecase.
                 Also if market price data is available, include price specifics in the summary.
                 `,
+                strict: true,
                 parameters: {
                     type: 'object',
                     properties: {
@@ -137,6 +140,7 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                         investor_interest: { type: 'string', description: 'What investors are most interested in' },
                     },
                     required: ['current_situation', 'top_discussed_topics', 'recent_information', 'investor_interest'],
+                    additionalProperties: false,
                 },
             },
         },
@@ -150,6 +154,7 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                     If price data is available, include it in the recommendation.
                     Also adjust your language and reasoning so it corresponds with user's persona.
                 `,
+                strict: true,
                 parameters: {
                     type: 'object',
                     properties: {
@@ -163,7 +168,8 @@ function getTools(data: ScrapedData): ChatCompletionTool[] | null {
                         reasoning: { type: 'string', description: 'Explain why you have chosen recommandation for given persona and usecase' },
                         potential_risks: { type: 'array', items: { type: 'string' }, description: 'Possible risks the user should consider' },
                     },
-                    required: ['persona_analysis', 'recommendation', 'potential_risks'],
+                    required: ['persona_analysis', 'action', 'summary', 'reasoning', 'potential_risks'],
+                    additionalProperties: false,
                 },
             },
         },
@@ -179,4 +185,5 @@ const analysis = {
         reasoning: { type: 'string', description: 'Explanation of sentiment' },
     },
     required: ['category', 'confidence', 'sentiment_score', 'reasoning'],
+    additionalProperties: false,
 };
