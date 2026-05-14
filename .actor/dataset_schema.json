@@ -4,100 +4,92 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "analysis": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "type": {
-                            "type": "string"
-                        },
-                        "ticker": {
-                            "type": "string"
-                        },
-                        "error": {
-                            "type": "string"
-                        },
-                        "sentiment_analysis": {
-                            "type": "object",
-                            "properties": {
-                                "google": {
-                                    "type": "object",
-                                    "properties": {
-                                        "category": {
-                                            "type": "string"
-                                        },
-                                        "confidence": {
-                                            "type": "number"
-                                        },
-                                        "sentiment_score": {
-                                            "type": "number"
-                                        },
-                                        "reasoning": {
-                                            "type": "string"
-                                        }
-                                    }
-                                },
-                                "twitter": {
-                                    "type": "object",
-                                    "properties": {
-                                        "category": {
-                                            "type": "string"
-                                        },
-                                        "confidence": {
-                                            "type": "number"
-                                        },
-                                        "sentiment_score": {
-                                            "type": "number"
-                                        },
-                                        "reasoning": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "market_summary": {
-                            "type": "object",
-                            "properties": {
-                                "current_situation": {
-                                    "type": "string"
-                                },
-                                "top_discussed_topics": {
-                                    "type": "array"
-                                },
-                                "recent_information": {
-                                    "type": "array"
-                                },
-                                "investor_interest": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "personalized_recommendation": {
-                            "type": "object",
-                            "properties": {
-                                "persona_analysis": {
-                                    "type": "string"
-                                },
-                                "action": {
-                                    "type": "string"
-                                },
-                                "summary": {
-                                    "type": "string"
-                                },
-                                "reasoning": {
-                                    "type": "string"
-                                },
-                                "potential_risks": {
-                                    "type": "array"
-                                }
-                            }
+            "type": {
+                "type": "string",
+                "enum": ["company", "cryptocurrency"]
+            },
+            "ticker": {
+                "type": "string"
+            },
+            "error": {
+                "type": "string"
+            },
+            "sentiment_analysis": {
+                "type": "object",
+                "properties": {
+                    "google": {
+                        "type": "object",
+                        "properties": {
+                            "category": { "type": "string", "enum": ["Positive", "Neutral", "Negative"] },
+                            "confidence": { "type": "number" },
+                            "sentiment_score": { "type": "number" },
+                            "reasoning": { "type": "string" }
+                        }
+                    },
+                    "twitter": {
+                        "type": "object",
+                        "properties": {
+                            "category": { "type": "string", "enum": ["Positive", "Neutral", "Negative"] },
+                            "confidence": { "type": "number" },
+                            "sentiment_score": { "type": "number" },
+                            "reasoning": { "type": "string" }
                         }
                     }
+                }
+            },
+            "market_summary": {
+                "type": "object",
+                "properties": {
+                    "current_situation": { "type": "string" },
+                    "top_discussed_topics": { "type": "array", "items": { "type": "string" } },
+                    "recent_information": { "type": "array", "items": { "type": "string" } },
+                    "investor_interest": { "type": "string" }
+                }
+            },
+            "personalized_recommendation": {
+                "type": "object",
+                "properties": {
+                    "persona_analysis": { "type": "string" },
+                    "action": { "type": "string", "enum": ["Buy", "Hold", "Sell"] },
+                    "summary": { "type": "string" },
+                    "reasoning": { "type": "string" },
+                    "potential_risks": { "type": "array", "items": { "type": "string" } }
                 }
             }
         }
     },
-    "views": {}
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "ticker",
+                    "type",
+                    "sentiment_analysis.google.category",
+                    "sentiment_analysis.google.sentiment_score",
+                    "sentiment_analysis.twitter.category",
+                    "sentiment_analysis.twitter.sentiment_score",
+                    "market_summary.current_situation",
+                    "personalized_recommendation.action",
+                    "personalized_recommendation.summary",
+                    "error"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "ticker": { "label": "Ticker", "format": "text" },
+                    "type": { "label": "Type", "format": "text" },
+                    "sentiment_analysis.google.category": { "label": "Google sentiment", "format": "text" },
+                    "sentiment_analysis.google.sentiment_score": { "label": "Google score", "format": "number" },
+                    "sentiment_analysis.twitter.category": { "label": "Twitter sentiment", "format": "text" },
+                    "sentiment_analysis.twitter.sentiment_score": { "label": "Twitter score", "format": "number" },
+                    "market_summary.current_situation": { "label": "Market situation", "format": "text" },
+                    "personalized_recommendation.action": { "label": "Recommendation", "format": "text" },
+                    "personalized_recommendation.summary": { "label": "Recommendation summary", "format": "text" },
+                    "error": { "label": "Error", "format": "text" }
+                }
+            }
+        }
+    }
 }
